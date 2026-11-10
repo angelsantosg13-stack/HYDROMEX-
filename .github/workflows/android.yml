@@ -1,0 +1,42 @@
+name: Crear APK HYDROMEX
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Instalar SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Descomprimir HYDROMEX
+        run: unzip -o HYDROMEX-Android-v1-1.zip -d .
+
+      - name: Compilar APK
+        run: gradle -p HYDROMEX-Android assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HYDROMEX-APK
+          path: HYDROMEX-Android/app/build/outputs/apk/debug/app-debug.apk
