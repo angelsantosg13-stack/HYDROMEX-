@@ -1,8 +1,12 @@
+
 name: Crear APK HYDROMEX
 
 on:
   push:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -18,25 +22,31 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Preparar Android
-        uses: android-actions/setup-android@v3
-
       - name: Preparar Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Instalar SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Instalar SDK Android
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Descomprimir HYDROMEX
+      - name: Extraer proyecto
         run: unzip -o HYDROMEX-Android-v1-1.zip -d .
 
+      - name: Localizar proyecto
+        run: |
+          PROJECT_DIR=$(dirname "$(find . -name settings.gradle.kts -o -name settings.gradle | head -n 1)")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
       - name: Compilar APK
-        run: gradle -p HYDROMEX-Android assembleDebug
+        run: gradle -p "$PROJECT_DIR" assembleDebug
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
         with:
           name: HYDROMEX-APK
-          path: HYDROMEX-Android/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/build/outputs/apk/debug/*.apk"
+          if-no-files-found: error
+          
