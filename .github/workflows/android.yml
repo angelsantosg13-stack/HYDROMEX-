@@ -58,6 +58,12 @@ jobs:
           fi
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
+      - name: Corregir clase River
+        run: |
+          FILE="$PROJECT_DIR/app/src/main/java/com/hydromex/app/MainActivity.kt"
+          sed -i -E 's/^private[[:space:]]+((data|sealed|enum|value)[[:space:]]+)?class River/\1class River/' "$FILE"
+          grep -n "class River" "$FILE"
+          
       - name: Compilar APK
         run: gradle -p "$PROJECT_DIR" assembleDebug
 
