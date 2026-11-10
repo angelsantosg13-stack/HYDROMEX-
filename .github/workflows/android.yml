@@ -39,8 +39,7 @@ jobs:
             echo "No se encontró sdkmanager"
             exit 1
           fi
-          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
-          chmod +x "$SDKMANAGER"
+                    echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
 
       - name: Instalar SDK Android
         run: |
